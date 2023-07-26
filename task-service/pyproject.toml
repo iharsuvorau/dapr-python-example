@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "task-service"
+version = "0.1.0"
+description = ""
+authors = ["Ihar Suvorau <ihar.suvorau@gmail.com>"]
+packages = [{ include = "task_service" }]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+dapr = "^1.10.0"
+fastapi = "^0.100.0"
+uvicorn = "^0.23.1"
+pydantic = "^2.1.0"
+
+[tool.ruff]
+line-length = 120
+
+[tool.black]
+line-length = 120
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
