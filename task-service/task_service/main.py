@@ -1,10 +1,10 @@
+import json
 import logging
-from dataclasses import dataclass
-from typing import Optional
 
-from fastapi import APIRouter, FastAPI
+from dapr.clients import DaprClient
+from fastapi import FastAPI, HTTPException
 
-from task_service.weather_tasks.model import WeatherTask
+from task_service.weather_tasks.model import TaskStatus, WeatherResult
 from task_service.weather_tasks.repository import WeatherTaskRepository
 
 logger = logging.getLogger(__name__)
@@ -24,31 +24,64 @@ app.openapi()["info"]["title"] = "Weather Task Service"
 app.state.logger = logger
 
 
-router = APIRouter(prefix="/weather")
-
-
-@dataclass
-class WeatherResponse:
-    location: str
-    data: Optional[WeatherTask]
-
-
-@router.get("/{location}")
+@app.get("/weather/{location}")
 async def get_task(location: str):
-    task = repository.get_task(location.lower())
-    return WeatherResponse(location=location, data=task)
+    return repository.get_task(location.lower())
 
 
-@router.post("/")
+@app.post("/weather/{location}")
 async def create_task(location: str):
     location = location.lower()
     existing_task = repository.get_task(location)
     if existing_task is not None:
-        return WeatherResponse(location=location, data=existing_task)
-    return repository.create_task(location)
+        return existing_task
+
+    create_task_response = repository.create_task(location)
+
+    with DaprClient() as client:
+        publish_response = client.publish_event(
+            pubsub_name="pubsub",
+            topic_name="weather",
+            data=json.dumps({"location": location}),
+        )
+
+    return {
+        "create_task_response": create_task_response,
+        "publish_response": publish_response,
+    }
 
 
-app.include_router(router)
+@app.delete("/weather/{location}")
+async def delete_task(location: str):
+    location = location.lower()
+
+    if repository.get_task(location) is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    delete_task_response = repository.delete_task(location)
+
+    return {
+        "response": delete_task_response,
+    }
+
+
+@app.get("/dapr/subscribe")
+async def subscribe():
+    app.state.logger.info("Subscribing to pubsub")
+    return [
+        {
+            "pubsubname": "pubsub",
+            "topic": "weather-result",
+            "route": "weather-result",
+        }
+    ]
+
+
+@app.post("/weather-result")
+async def weather_result(raw_event: dict):
+    app.state.logger.info(f"Received weather result event: {raw_event}")
+    result = WeatherResult(**json.loads(raw_event["data"]))
+    repository.update_task(result.location, TaskStatus.COMPLETED, result)
 
 
 if __name__ == "__main__":
