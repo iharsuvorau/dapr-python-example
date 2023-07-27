@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -63,12 +64,12 @@ async def handle_location(location: str):
 def get_weather(location: str):
     weather_path = Path("weather.xml")
 
-    if not weather_path.exists():
+    if not weather_path.exists() or weather_path.stat().st_mtime < (time.time() - 3600):
         xml = fetch_weather()
         weather_path.write_text(xml)
-        xml = xml.encode()
     else:
         xml = weather_path.read_bytes()
+    xml = xml.encode()
 
     for name, temperature, phenomenon in parse_weather(xml):
         if location.lower() in name.lower():
