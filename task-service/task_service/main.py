@@ -65,6 +65,7 @@ async def delete_task(location: str):
     }
 
 
+# Dapr pubsub subscription
 @app.get("/dapr/subscribe")
 async def subscribe():
     app.state.logger.info("Subscribing to pubsub")
@@ -77,6 +78,7 @@ async def subscribe():
     ]
 
 
+# Dapr pubsub subscription handler
 @app.post("/weather-result")
 async def weather_result(raw_event: dict):
     app.state.logger.info(f"Received weather result event: {raw_event}")

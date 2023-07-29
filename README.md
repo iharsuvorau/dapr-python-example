@@ -65,7 +65,7 @@ The following Dapr building blocks are used in this example (more to come):
 - [ ] Service invocation
 - [x] State management
 - [x] Publish & subscribe messaging
-- [ ] Bindings
+- [x] Bindings
 - [ ] Actors
 - [ ] Observability
 - [x] Secrets management

@@ -16,6 +16,8 @@ app = FastAPI()
 app.openapi()["info"]["title"] = "Weather Service"
 app.state.logger = logger
 
+weather_path = Path("weather.xml")
+
 
 @app.get("/dapr/subscribe")
 async def subscribe():
@@ -41,6 +43,19 @@ async def weather(raw_event: dict):
     return await handle_location(event.location)
 
 
+# Dapr input binding from cron
+@app.post("/cron")
+async def handle_cron():
+    app.state.logger.info("Received cron event. Prefetching weather data")
+    xml = fetch_weather()
+    weather_path.write_text(xml)
+
+
+@app.options("/cron")
+async def handle_cron_options():
+    app.state.logger.info("Received cron options event")
+
+
 async def handle_location(location: str):
     temperature, phenomenon = get_weather(location)
     if temperature is None:
@@ -62,8 +77,6 @@ async def handle_location(location: str):
 
 
 def get_weather(location: str):
-    weather_path = Path("weather.xml")
-
     if not weather_path.exists() or weather_path.stat().st_mtime < (time.time() - 3600):
         xml = fetch_weather()
         weather_path.write_text(xml)
