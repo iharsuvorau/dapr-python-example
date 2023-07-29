@@ -19,6 +19,7 @@ graph LR
 
     task_service[Task Service]
     weather_service[Weather Service]
+    cron[Cron Input Binding]
 
     request([HTTP Request]) --> task_service
     task_service -- publishes to --> weather_request
@@ -27,6 +28,9 @@ graph LR
 
     weather_service -- subscribes to --> weather_request
     weather_service -- publishes to --> weather_result
+    cron -- calls --> weather_service
+    cron -- every 5 seconds --> cron
+    weather_service -- prefetches weather --> weather_service
 ```
 
 ## Getting Started
