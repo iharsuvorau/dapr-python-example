@@ -6,6 +6,8 @@ The idea is to have a task service that queries the weather service for the weat
 
 Communication between two services is decoupled using a message queue (RabbitMQ). Redis is used to cache the state of the task service.
 
+To use the input binding component, a cron job is introduced that calls the weather service every 5 seconds to prefetch weather data for Estonia.
+
 ```mermaid
 graph LR
     subgraph Queue
