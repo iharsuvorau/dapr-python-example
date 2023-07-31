@@ -3,6 +3,8 @@ kind: Component
 metadata:
   name: pubsub
   namespace: dapr-python-reference
+annotations:
+  dapr.io/config: "daprConfig"
 spec:
   type: pubsub.rabbitmq
   version: v1

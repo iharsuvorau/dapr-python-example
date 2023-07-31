@@ -3,6 +3,8 @@ kind: Component
 metadata:
   name: cron
   namespace: dapr-python-reference
+annotations:
+  dapr.io/config: "daprConfig"  
 spec:
   type: bindings.cron
   version: v1
