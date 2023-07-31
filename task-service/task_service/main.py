@@ -2,6 +2,7 @@ import json
 import logging
 
 from dapr.clients import DaprClient
+from dapr.ext.fastapi import DaprApp
 from fastapi import FastAPI, HTTPException
 
 from task_service.weather_tasks.model import TaskStatus, WeatherResult
@@ -22,6 +23,8 @@ def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.openapi()["info"]["title"] = "Weather Task Service"
 app.state.logger = logger
+
+dapr_app = DaprApp(app_instance=app)
 
 
 @app.get("/weather/{location}")
@@ -65,21 +68,8 @@ async def delete_task(location: str):
     }
 
 
-# Dapr pubsub subscription
-@app.get("/dapr/subscribe")
-async def subscribe():
-    app.state.logger.info("Subscribing to pubsub")
-    return [
-        {
-            "pubsubname": "pubsub",
-            "topic": "weather-result",
-            "route": "weather-result",
-        }
-    ]
-
-
-# Dapr pubsub subscription handler
-@app.post("/weather-result")
+# Dapr pubsub subscription using FastAPI extension
+@dapr_app.subscribe(pubsub="pubsub", topic="weather-result")
 async def weather_result(raw_event: dict):
     app.state.logger.info(f"Received weather result event: {raw_event}")
     result = WeatherResult(**json.loads(raw_event["data"]))

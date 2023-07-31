@@ -12,6 +12,7 @@ dapr = "^1.10.0"
 uvicorn = "^0.23.1"
 httpx = "^0.24.1"
 lxml = "^4.9.3"
+dapr-ext-fastapi = "^1.10.0"
 
 [tool.ruff]
 line-length = 120

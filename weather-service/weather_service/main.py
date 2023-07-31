@@ -19,6 +19,7 @@ app.state.logger = logger
 weather_path = Path("weather.xml")
 
 
+# Dapr pubsub subscription without using FastAPI extension
 @app.get("/dapr/subscribe")
 async def subscribe():
     app.state.logger.info("Subscribing to pubsub")
@@ -36,6 +37,7 @@ class Event:
     location: str
 
 
+# Dapr pubsub subscription handler
 @app.post("/weather")
 async def weather(raw_event: dict):
     app.state.logger.info(f"Received weather event: {raw_event}")
@@ -80,9 +82,9 @@ def get_weather(location: str):
     if not weather_path.exists() or weather_path.stat().st_mtime < (time.time() - 3600):
         xml = fetch_weather()
         weather_path.write_text(xml)
+        xml = xml.encode()
     else:
         xml = weather_path.read_bytes()
-    xml = xml.encode()
 
     for name, temperature, phenomenon in parse_weather(xml):
         if location.lower() in name.lower():

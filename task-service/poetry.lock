@@ -311,6 +311,22 @@ python-dateutil = ">=2.8.1"
 typing-extensions = ">=4.4.0"
 
 [[package]]
+name = "dapr-ext-fastapi"
+version = "1.10.0"
+description = "The official release of Dapr FastAPI extension."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "dapr-ext-fastapi-1.10.0.tar.gz", hash = "sha256:7abb58f7edbc53ac9df596b7f35300b523d0e0bc8b7185eeb8936388a9d3a557"},
+    {file = "dapr_ext_fastapi-1.10.0-py3-none-any.whl", hash = "sha256:166880fbcdf241771da7a2b5dc9dc48fcb2e187d55d396c043943e08e36dbfff"},
+]
+
+[package.dependencies]
+dapr = ">=1.10.0"
+fastapi = ">=0.60.1"
+uvicorn = ">=0.11.6"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.1.2"
 description = "Backport of PEP 654 (exception groups)"
@@ -904,4 +920,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "edec4da050d40045c1281a18faf10c93b448ab3077807b48824bb6a67416d4b9"
+content-hash = "8cd05afabec3f9b6d420f789384436d51128952d6070bc3584fcd4afc27ce438"
