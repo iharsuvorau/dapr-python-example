@@ -73,7 +73,7 @@ The following Dapr building blocks are used in this example (more to come):
 - [x] Publish & subscribe messaging
 - [x] Bindings
 - [ ] Actors
-- [ ] Observability
+- [x] Observability
 - [x] Secrets management
 - [ ] Configuration
 - [ ] Distributed lock
