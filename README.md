@@ -19,20 +19,39 @@ graph LR
         Redis
     end
 
-    task_service[Task Service]
-    weather_service[Weather Service]
+    subgraph Task Service
+        fastapi[FastAPI]
+
+        subgraph Dapr[Dapr]
+            metrics[Prometheus Metrics]
+        end
+    end
+
+    subgraph Weather Service
+        fastapi2[FastAPI]
+        
+        subgraph Dapr2[Dapr]
+            metrics2[Prometheus Metrics]
+        end
+    end
+
+    prometheus[Prometheus] --> metrics
+    prometheus[Prometheus] --> metrics2
+
     cron[Cron Input Binding]
 
-    request([HTTP Request]) --> task_service
-    task_service -- publishes to --> weather_request
-    task_service -- saves in --> Redis
-    task_service -- subscribes to --> weather_result
+    request([HTTP Request]) --> fastapi
+    fastapi -- publishes to --> weather_request
+    fastapi -- saves in --> Redis
+    fastapi -- subscribes to --> weather_result
 
-    weather_service -- subscribes to --> weather_request
-    weather_service -- publishes to --> weather_result
-    cron -- calls --> weather_service
+    fastapi2 -- subscribes to --> weather_request
+    fastapi2 -- publishes to --> weather_result
+    cron -- calls --> fastapi2
     cron -- every 5 seconds --> cron
-    weather_service -- prefetches weather --> weather_service
+    fastapi2 -- prefetches weather --> fastapi2
+
+
 ```
 
 ## Getting Started
